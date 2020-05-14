@@ -1,0 +1,14 @@
+# update configuration and save a copy as config.yml in same directory
+
+fastapi:
+  debug: true
+
+databases:
+  default:
+    ENGINE: 'mongodb'
+    DRIVER: 'motor'
+    NAME: 'db_kartu'
+    USER: ''
+    PASSWORD: ''
+    HOST: 'localhost'
+    PORT: 27017
