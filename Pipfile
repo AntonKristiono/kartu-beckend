@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+python-multipart = "*"
+python-pycompile = "*"
 
 [requires]
 python_version = "3.8"
