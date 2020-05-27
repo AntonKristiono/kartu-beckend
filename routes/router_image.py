@@ -9,11 +9,16 @@ import random
 import string
 import shutil
 import os
+# import cv2
+
 from PIL import Image
+from autocrop import Cropper
 
 from .model_image import MediaBase
 
 router_image = APIRouter()
+cropper = Cropper()
+
 
 
 def validate_object_id(id_: str):
@@ -45,7 +50,14 @@ def randomString(stringLength=6):
     return ''.join(random.choice(letters) for i in range(stringLength))
 
 
-async def image_process(dm: MediaBase):
+def image_process(dm: MediaBase):
+    # Cropper Wizard
+    # cropper = Cropper()
+    # print(dm.origin_name)
+    cropped_array = cropper.crop(dm.origin_name)
+    cropped_image = Image.fromarray(cropped_array)
+    cropped_image.save(dm.file_name + 'crop.' + dm.file_type)
+    #
     image = Image.open(dm.origin_name)
     # resize std
     image.thumbnail((800, 800))
@@ -53,25 +65,25 @@ async def image_process(dm: MediaBase):
     # resize thumb
     image.thumbnail((400, 400))
     image.save(dm.file_name + 'thumb.' + dm.file_type)
-    horizontal, vertical = image.size
-    if horizontal>vertical:
-        ico_max = 150 * horizontal / vertical
-        image.thumbnail((ico_max, ico_max))
-        horizontal, vertical = image.size
-        jarak1 = (horizontal - 150) / 2
-        jarak2 = jarak1 + 150
-        box = (jarak1, 0, jarak2, 150)
-        image_crop = image.crop(box)
-        image_crop.save(dm.file_name + 'ico.' + dm.file_type)
-    else:
-        ico_max = 150 * vertical / horizontal
-        image.thumbnail((ico_max, ico_max))
-        horizontal, vertical = image.size
-        jarak1 = (vertical - 150) / 2
-        jarak2 = jarak1 + 150
-        box = (0, jarak1, 150, jarak2)
-        image_crop = image.crop(box)
-        image_crop.save(dm.file_name + 'ico.' + dm.file_type)
+    # horizontal, vertical = image.size
+    # if horizontal>vertical:
+    #     ico_max = 150 * horizontal / vertical
+    #     image.thumbnail((ico_max, ico_max))
+    #     horizontal, vertical = image.size
+    #     jarak1 = (horizontal - 150) / 2
+    #     jarak2 = jarak1 + 150
+    #     box = (jarak1, 0, jarak2, 150)
+    #     image_crop = image.crop(box)
+    #     image_crop.save(dm.file_name + 'ico.' + dm.file_type)
+    # else:
+    #     ico_max = 150 * vertical / horizontal
+    #     image.thumbnail((ico_max, ico_max))
+    #     horizontal, vertical = image.size
+    #     jarak1 = (vertical - 150) / 2
+    #     jarak2 = jarak1 + 150
+    #     box = (0, jarak1, 150, jarak2)
+    #     image_crop = image.crop(box)
+    #     image_crop.save(dm.file_name + 'ico.' + dm.file_type)
         # resize icon im.crop((left, top, right, bottom))
     os.remove(dm.origin_name)
 
@@ -93,7 +105,7 @@ async def upload_image(background_tasks: BackgroundTasks, file: UploadFile = Fil
         upload = open(os.path.join(folder, origin_name), 'wb+')
         shutil.copyfileobj(file_object, upload)
         upload.close()
-        # proses image di back ground
+        # proses image di background
         extention = content_type.replace('image/', '')
         random = randomString(8)
         dm.name = str(date.today()) + '_' + random + '_'
