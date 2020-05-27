@@ -9,6 +9,7 @@ import random
 import string
 import shutil
 import os
+import cv2
 from PIL import Image
 
 from .model_desainkartu import MediaCardBase
@@ -42,16 +43,21 @@ def randomString(stringLength=6):
 
 async def image_process(dm: MediaCardBase):
     image = Image.open(dm.origin_name)
+    r_width, r_height = image.size
+    # print(image.shape)
     height = 310
     width = 488
     # TODO Belum Otomatis Landscape , potrait
-    new_image = image.resize((width, height))
-    new_image.save(dm.file_name + 'landscape.' + dm.file_type )
-    new_image = image.resize((height, width))
-    new_image.save(dm.file_name + 'potrait.' + dm.file_type )
+    # if width>height:
+    if r_width > r_height :
+        new_image = image.resize((width, height))
+        new_image.save(dm.file_name + 'landscape.' + dm.file_type )
+    else :
+        new_image = image.resize((height, width))
+        new_image.save(dm.file_name + 'potrait.' + dm.file_type )
     # image.thumbnail((size_potrait))
     # image.save(dm.file_name + 'potrait.' + dm.file_type )
-    horizontal, vertical = image.size
+    # horizontal, vertical = image.size
     os.remove(dm.origin_name)
 
 
