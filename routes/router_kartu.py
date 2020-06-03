@@ -73,7 +73,6 @@ async def get_kartu_by_id(id_: ObjectId = Depends(validate_object_id)):
     else:
         raise HTTPException(status_code=404, detail="Kartu not found")
 
-
 @router_kartu.delete("/{id_}", response_model=dict)
 async def delete_kartu_by_id(id_: str):
     kartu_op = await DB.tbl_kartu.delete_one({"_id": ObjectId(id_)})

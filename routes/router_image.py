@@ -99,7 +99,6 @@ async def upload_image(background_tasks: BackgroundTasks, file: UploadFile = Fil
         origin_name = randomString(6) + file.filename
         # folder = "/root/piton/pro_sopan/images/"
         folder = "/home/anton/work/tki/kartu/server/datafoto/"
-        # folder = "/datafoto/"
         file_location = folder + origin_name
         file_object = file.file
         upload = open(os.path.join(folder, origin_name), 'wb+')

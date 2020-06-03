@@ -8,11 +8,12 @@ class KartuBase(BaseModel):
     createDate: datetime = None
     updateDate: datetime = None
     companyId: str = None
-    accountId: str  # nis nomor_akun dll
-    nama: str
+    accountId: str = None # nis nomor_akun dll
+    nama: str = None
     tempatLahir: str = None
     tanggalLahir: str = None
     images: str = None
+    alamat: str = None
 
 
 class KartuOnDb(KartuBase):
