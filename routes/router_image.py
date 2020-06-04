@@ -56,7 +56,7 @@ def image_process(dm: MediaBase):
     # print(dm.origin_name)
     cropped_array = cropper.crop(dm.origin_name)
     cropped_image = Image.fromarray(cropped_array)
-    cropped_image.save(dm.file_name + 'crop.' + dm.file_type)
+    cropped_image.save(dm.file_name + 'facecrop.' + dm.file_type)
     #
     image = Image.open(dm.origin_name)
     # resize std
@@ -98,7 +98,7 @@ async def upload_image(background_tasks: BackgroundTasks, file: UploadFile = Fil
         dm = MediaBase()
         origin_name = randomString(6) + file.filename
         # folder = "/root/piton/pro_sopan/images/"
-        folder = "/home/anton/work/tki/kartu/server/datafoto/"
+        folder = "/home/anton/work/tki/kartu/beck-end/datafoto/"
         file_location = folder + origin_name
         file_object = file.file
         upload = open(os.path.join(folder, origin_name), 'wb+')
@@ -120,6 +120,40 @@ async def upload_image(background_tasks: BackgroundTasks, file: UploadFile = Fil
         # save image data to db
         DB.tbl_image.insert_one(dm.dict())
         return dm.dict()
+    else:
+        raise HTTPException(status_code=406, detail="Unknown image type")
+
+@router_image.post("/uploadBulkFile")
+async def upload_image(background_tasks: BackgroundTasks, files: List[UploadFile] = File(...)):
+    content_type = file.content_type
+    # cek file extension png jpg jpeg gif namafile: 20_04_25_750x500_abcdefgh
+    if content_type == "image/jpeg" or content_type == "image/jpg" or content_type == "image/png" or content_type == "image/gif":
+        dm = MediaBase()
+        origin_name = randomString(6) + file.filename
+        # folder = "/root/piton/pro_sopan/images/"
+        folder = "/home/anton/work/tki/kartu/beck-end/datafoto/"
+        file_location = folder + origin_name
+        file_object = file.files
+        upload = open(os.path.join(folder, origin_name), 'wb+')
+        shutil.copyfileobj(file_object, upload)
+        upload.close()
+        # proses image di background
+        extention = content_type.replace('image/', '')
+        random = randomString(8)
+        dm.name = str(date.today()) + '_' + random + '_'
+        new_file_name = folder + dm.name
+        dm.createTime = datetime.utcnow()
+        dm.updateTime = datetime.utcnow()
+        dm.companyId = ''
+        dm.creatorId = ''
+        dm.origin_name = file_location
+        dm.file_name = new_file_name
+        dm.file_type = extention
+        background_tasks.add_task(image_process, dm)
+        # save image data to db
+        DB.tbl_image.insert_many(dm.dict())
+        # return dm.dict()
+        return {"filenames": [file.filename for file in files]}
     else:
         raise HTTPException(status_code=406, detail="Unknown image type")
 
